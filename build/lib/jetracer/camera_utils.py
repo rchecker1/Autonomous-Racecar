@@ -1,3 +1,4 @@
+from jetcam.csi_camera import CSICamera
 # Updated camera_utils.py with PROVEN WORKING SETTINGS
 # Replace your /home/checker/jetracer/jetracer/camera_utils.py with this content
 
@@ -15,6 +16,7 @@ class JetRacerCamera:
         Args:
             mode: 'inference' for road following, 'training' for data collection, 'safe' for testing
         """
+        from jetcam.csi_camera import CSICamera
         # Based on our successful test: 640x480@21fps works perfectly
         # We'll scale to 224x224 in software if needed for models
         
