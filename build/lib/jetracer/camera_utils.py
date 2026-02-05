@@ -56,7 +56,6 @@ class JetRacerCamera:
                     print("failed")
                     return False
             else:
-                print("✗ Camera not capturing images")
                 return False
                 
         except Exception as e:
@@ -71,10 +70,8 @@ class JetRacerCamera:
                 time.sleep(1)
                 print("stopped")
         except Exception as e:
-            print(f"Warning during camera stop: {e}")
     
     def _process_image(self, image):
-        """Process raw camera image"""
         if image is None:
             return None
         
@@ -89,10 +86,9 @@ class JetRacerCamera:
         return image
     
     def read(self):
-        """Read and process image from camera"""
         try:
             if not self._running:
-                print("Warning: Camera not running")
+                print("cam off")
                 return None
             
             raw_image = self.camera.value
@@ -104,33 +100,27 @@ class JetRacerCamera:
     
     @property
     def value(self):
-        """Get current processed camera image"""
         return self.read()
     
     @property
     def raw_value(self):
-        """Get current raw camera image (full resolution)"""
         if hasattr(self.camera, 'value'):
             return self.camera.value
         return None
     
     @property
     def running(self):
-        """Check if camera is running"""
         return self._running
     
     @property
     def width(self):
-        """Get output image width"""
         return self.target_size[0] if self.target_size else 640
     
     @property
     def height(self):
-        """Get output image height"""
         return self.target_size[1] if self.target_size else 480
     
     def observe(self, callback, names='value'):
-        """Observe camera changes (for compatibility with existing code)"""
         if hasattr(self.camera, 'observe'):
             def wrapped_callback(change):
                 if 'new' in change:
@@ -150,7 +140,6 @@ class JetRacerCamera:
             return self.camera.unobserve_all()
 
 def test_jetracer_camera():
-    """Test all JetRacer camera modes"""
     modes = ['safe', 'training', 'inference']
     
     for mode in modes:
@@ -158,18 +147,13 @@ def test_jetracer_camera():
         try:
             cam = JetRacerCamera(mode)
             if cam.start():
-                # Test multiple captures
                 for i in range(3):
                     img = cam.read()
                     if img is not None:
-                        print(f"✓ {mode} capture {i+1}: {img.shape}")
                     else:
-                        print(f"✗ {mode} capture {i+1} failed")
                     time.sleep(0.5)
                 cam.stop()
-                print(f"✓ {mode} mode test complete")
             else:
-                print(f"✗ {mode} mode failed to start")
             time.sleep(2)
         except Exception as e:
             print(f"✗ {mode} mode error: {e}")
@@ -184,12 +168,10 @@ def release_all_cameras():
     frame = inspect.currentframe().f_back
     caller_globals = frame.f_globals
     
-    # Step 1: Find and stop all camera objects
     camera_vars = []
     for var_name in list(caller_globals.keys()):
         try:
             obj = caller_globals[var_name]
-            # Check for camera-like objects
             if (hasattr(obj, 'running') or 
                 hasattr(obj, 'cap') or 
                 'camera' in str(type(obj)).lower() or
@@ -208,7 +190,6 @@ def release_all_cameras():
                 obj.stop()
             if hasattr(obj, 'cap') and hasattr(obj.cap, 'release'):
                 obj.cap.release()
-            # Delete the variable
             del caller_globals[var_name]
         except Exception as e:
             print(f"cleaning error {var_name}: {e}")
