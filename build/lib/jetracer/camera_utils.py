@@ -1,98 +1,75 @@
 from jetcam.csi_camera import CSICamera
-# Updated camera_utils.py with PROVEN WORKING SETTINGS
-# Replace your /home/checker/jetracer/jetracer/camera_utils.py with this content
 
 from jetcam.csi_camera import CSICamera
 import cv2
 import time
 
 class JetRacerCamera:
-    """JetRacer camera with proven working configurations"""
+    """wroking sets"""
     
     def __init__(self, mode='inference'):
-        """
-        Initialize camera for different use cases
         
-        Args:
-            mode: 'inference' for road following, 'training' for data collection, 'safe' for testing
-        """
         from jetcam.csi_camera import CSICamera
-        # Based on our successful test: 640x480@21fps works perfectly
-        # We'll scale to 224x224 in software if needed for models
         
         if mode == 'inference':
-            # High performance for road following - use working config and resize
             self.camera = CSICamera(width=640, height=480, capture_fps=21)
-            self.target_size = (224, 224)  # Resize for model input
+            self.target_size = (224, 224)
             self.mode = 'inference'
         elif mode == 'training':
-            # Same reliable config for training
             self.camera = CSICamera(width=640, height=480, capture_fps=21)
-            self.target_size = (224, 224)  # Resize for model input
+            self.target_size = (224, 224) 
             self.mode = 'training'
         elif mode == 'safe':
-            # Full resolution for testing/debugging
             self.camera = CSICamera(width=640, height=480, capture_fps=21)
-            self.target_size = None  # No resizing
+            self.target_size = None 
             self.mode = 'safe'
         else:
-            # Default - same as safe
             self.camera = CSICamera(width=640, height=480, capture_fps=21)
             self.target_size = (224, 224)
             self.mode = 'default'
         
         self._running = False
-        print(f"✓ JetRacer camera created in '{mode}' mode")
+        print(f"created in '{mode}' mode")
         if self.target_size:
-            print(f"✓ Will resize from 640x480 to {self.target_size[0]}x{self.target_size[1]}")
+            print(f"resizingm 640x480 to {self.target_size[0]}x{self.target_size[1]}")
     
     def start(self):
-        """Start camera with proven working method"""
-        try:
-            print("Starting JetRacer camera...")
-            
-            # Stop if already running
+        try:            
             if self._running:
                 self.stop()
                 time.sleep(1)
             
-            # Start camera using proven method
             self.camera.running = True
             self._running = True
-            
-            # Wait for initialization
             time.sleep(3)
             
-            # Test capture using working method (.value)
             test_image = self.camera.value
             if test_image is not None:
-                print(f"✓ Camera started successfully")
-                print(f"✓ Raw image shape: {test_image.shape}")
+                print(f"started")
+                print(f"shape:  {test_image.shape}")
                 
-                # Test processed image
                 processed = self._process_image(test_image)
                 if processed is not None:
-                    print(f"✓ Processed image shape: {processed.shape}")
+                    print(f"image shape after procesing: {processed.shape}")
                     return True
                 else:
-                    print("✗ Image processing failed")
+                    print("failed")
                     return False
             else:
                 print("✗ Camera not capturing images")
                 return False
                 
         except Exception as e:
-            print(f"✗ Camera start failed: {e}")
+            print(f"failed: {e}")
             return False
     
     def stop(self):
-        """Stop camera safely"""
         try:
             if hasattr(self, 'camera') and self.camera:
                 self.camera.running = False
                 self._running = False
                 time.sleep(1)
-                print("✓ JetRacer camera stopped")
+                print("stopped")
         except Exception as e:
             print(f"Warning during camera stop: {e}")
     
@@ -101,13 +78,12 @@ class JetRacerCamera:
         if image is None:
             return None
         
-        # If we need to resize for model input
         if self.target_size:
             try:
                 resized = cv2.resize(image, self.target_size)
                 return resized
             except Exception as e:
-                print(f"Resize error: {e}")
+                print(f"failed resizeing {e}")
                 return image
         
         return image
